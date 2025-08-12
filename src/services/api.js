@@ -121,7 +121,7 @@ export const userAPI = {
   createUser: async (userData) => {
     try {
       const response = await apiClient.post('/users', userData);
-      return { success: true, data: response.data };
+      return response.data; 
     } catch (error) {
       return handleApiError(error);
     }

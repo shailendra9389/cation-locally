@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X, User, Lock, Eye, EyeOff, UserPlus, Shield, Wrench, Settings } from 'lucide-react';
 import { userAPI } from '../services/api';
 
-const UserManagement = ({ isOpen, onClose }) => {
+const UserManagement = ({ isOpen, onClose, onUserCreated }) => {
   const [formData, setFormData] = useState({
     name: '',
     password: '',
@@ -78,6 +78,7 @@ const UserManagement = ({ isOpen, onClose }) => {
       };
 
       const response = await userAPI.createUser(userData);
+      console.log('Create user response:', response);
       
       if (response.success) {
         setFormData({
@@ -87,10 +88,16 @@ const UserManagement = ({ isOpen, onClose }) => {
           userLevel: 'operator'
         });
         
+        // Call the onUserCreated callback if provided
+        if (typeof onUserCreated === 'function') {
+          onUserCreated(response.data);
+        }
+        
         onClose();
         alert('User created successfully!');
       } else {
         setError(response.error || 'Failed to create user');
+         console.warn('Create user failed:', response);
       }
     } catch (error) {
       console.error('Error creating user:', error);

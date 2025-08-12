@@ -207,7 +207,8 @@ const UserList = () => {
       {showAddUser && (
         <UserManagement
           isOpen={showAddUser}
-          onClose={handleUserCreated}
+          onClose={() => setShowAddUser(false)}
+          onUserCreated={handleUserCreated}
         />
       )}
     </div>

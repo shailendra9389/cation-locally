@@ -1,3 +1,6 @@
+
+
+
 import { useState } from "react";
 import { 
   Bot, 
@@ -41,7 +44,7 @@ const MetricCard = ({ icon, label, value, unit, subtitle }) => (
 );
 
 export const DashboardSidebar = ({ activeView = '3d', onViewChange }) => {
-  const [isOpen, setIsOpen] = useState(true);        // ✅ Manage open/close state
+  const [isOpen, setIsOpen] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const [motorIntensity, setMotorIntensity] = useState(0.00);
@@ -53,50 +56,51 @@ export const DashboardSidebar = ({ activeView = '3d', onViewChange }) => {
   const [electricalPowerGlobal] = useState(0.00);
 
   const handleToggle = () => setIsCollapsed(!isCollapsed);
-  const handleClose = () => setIsOpen(false);        // ✅ Close sidebar
-  const handleOpen = () => setIsOpen(true);          // ✅ Reopen sidebar
+  const handleClose = () => setIsOpen(false);
+  const handleOpen = () => setIsOpen(true);
 
   if (!isOpen) {
     return (
       <Button
         variant="ghost"
         size="sm"
-        onClick={handleOpen}        // ✅ Click to reopen sidebar
+        onClick={handleOpen}
         className="fixed top-25 left-4 z-50 text-dashboard-text hover:bg-dashboard-blue/10 bg-dashboard-bg border border-dashboard-blue/20 bg-gray-400 "
       >
         <div className="mt-0 ml-0">
-  <Menu className="h-4 w-4" />
-</div>
+          <Menu className="h-4 w-4" />
+        </div>
       </Button>
     );
   }
 
   return (
-    <div className={`bg-dashboard-bg border-r border-dashboard-blue/20 transition-all duration-300 ${
+    <div className={`bg-gray-800 border-r border-dashboard-blue/20 transition-all duration-300 ${
       isCollapsed ? 'w-16' : 'w-80'
     } h-screen flex flex-col`}>
       {/* Header */}
       <div className="p-4 border-b border-dashboard-blue/20">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
-            <h2 className="text-lg font-semibold text-dashboard-text">Control Panel</h2>
+            <h2 className="text-xl font-bold text-dashboard-text text-white">Control Panel</h2>
           )}
           <div className="flex items-center gap-2">
             {!isCollapsed && (
               <Button
+              text="white"
                 variant="ghost"
                 size="sm"
-                onClick={handleClose}        // ✅ Close sidebar when clicking X
-                className="text-dashboard-text hover:bg-dashboard-blue/10"
+                onClick={handleClose}
+                className="text-dashboard-text hover:bg-dashboard-blue/10 bg-white"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4 bg-white" />
               </Button>
             )}
             <Button
               variant="ghost"
               size="sm"
               onClick={handleToggle}
-              className="text-dashboard-text hover:bg-dashboard-blue/10"
+              className="text-dashboard-text hover:bg-dashboard-blue/10 bg-white"
             >
               {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             </Button>
@@ -111,7 +115,7 @@ export const DashboardSidebar = ({ activeView = '3d', onViewChange }) => {
           <div className="space-y-4">
             <div 
               onClick={() => onViewChange('3d')} 
-              className={`cursor-pointer p-2 rounded-full ${activeView === '3d' ? 'bg-dashboard-blue/20' : ''}`}
+              className={`cursor-pointer p-2 rounded-full  bg-white ${activeView === '3d' ? 'bg-dashboard-blue/20' : ''}`}
             >
               <Box className="h-6 w-6 text-dashboard-blue mx-auto" />
             </div>
@@ -135,15 +139,15 @@ export const DashboardSidebar = ({ activeView = '3d', onViewChange }) => {
             <div className="mb-6 space-y-2">
               <Button 
                 variant="ghost" 
-                className={`w-full justify-start ${activeView === '3d' ? 'bg-dashboard-blue/20' : ''} hover:bg-dashboard-blue/10 text-dashboard-text`}
+                className={`w-full justify-start ${activeView === '3d' ? 'bg-dashboard-blue/20' : ''} hover:bg-dashboard-blue/10 text-dashboard-text bg-white`}
                 onClick={() => onViewChange('3d')}
               >
-                <Box className="h-5 w-5 mr-2" />
+                <Box className="h-5 w-5 mr-2 b" />
                 3D Viewer
               </Button>
               <Button 
                 variant="ghost" 
-                className={`w-full justify-start ${activeView === 'users' ? 'bg-dashboard-blue/20' : ''} hover:bg-dashboard-blue/10 text-dashboard-text`}
+                className={`w-full justify-start ${activeView === 'users' ? 'bg-dashboard-blue/20' : ''} hover:bg-dashboard-blue/10 text-dashboard-text bg-white`}
                 onClick={() => onViewChange('users')}
               >
                 <Users className="h-5 w-5 mr-2" />
@@ -183,11 +187,11 @@ export const DashboardSidebar = ({ activeView = '3d', onViewChange }) => {
             </div>
 
             {/* Status Indicator */}
-            <Card className="p-4 bg-dashboard-card border-dashboard-blue/20">
+            {/* <Card className="p-4 bg-dashboard-card border-dashboard-blue/20">
               <div className="flex items-center justify-center">
                 <Lightbulb className="h-8 w-8 text-dashboard-accent" />
               </div>
-            </Card>
+            </Card> */}
 
             {/* Motor Intensity */}
             <MetricCard
@@ -220,49 +224,21 @@ export const DashboardSidebar = ({ activeView = '3d', onViewChange }) => {
               unit="Wh/b"
             />
 
-            <MetricCard
+            {/* <MetricCard
               icon={<Zap className="h-5 w-5" />}
               label="Electrical Power Global"
               value={electricalPowerGlobal.toFixed(2)}
               unit="KW"
-            />
+            /> */}
 
             {/* Navigation */}
-            <Card className="p-4 bg-dashboard-card border-dashboard-blue/20 mt-6">
-              <div className="space-y-2">
-                <Button 
-                  variant="outline" 
-                  className={`w-full border-dashboard-blue/20 text-dashboard-text hover:bg-dashboard-blue/10 ${activeView === '3d' ? 'bg-dashboard-blue/20' : 'bg-gray-600'}`}
-                  onClick={() => onViewChange('3d')}
-                >
-                  <Bot className="h-4 w-4 mr-2" />
-                  3D View
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  className={`w-full border-dashboard-blue/20 text-dashboard-text hover:bg-dashboard-blue/10 ${activeView === 'users' ? 'bg-dashboard-blue/20' : 'bg-gray-600'}`}
-                  onClick={() => onViewChange('users')}
-                >
-                  <Users className="h-4 w-4 mr-2" />
-                  User Management
-                </Button>
-              </div>
-            </Card>
+           
             
-            {/* Settings */}
-            <Card className="p-4 bg-dashboard-card border-dashboard-blue/20 mt-6">
-              <Button 
-                variant="outline" 
-                className="w-full border-dashboard-blue/20 text-dashboard-text hover:bg-dashboard-blue/10 bg-gray-600"
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </Button>
-            </Card>
+           
           </div>
         )}
       </div>
     </div>
   );
 };
+

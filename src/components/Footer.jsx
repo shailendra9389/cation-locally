@@ -1,3 +1,6 @@
+
+
+
 import React, { useState, useEffect } from 'react';
 import { RotateCcw, Waves, Syringe, Package, RotateCw, Wrench, Lock, AlertTriangle, Wifi, WifiOff } from 'lucide-react';
 import axios from 'axios';
@@ -14,25 +17,14 @@ const Footer = ({ userLevel: propUserLevel }) => {
       maintenance: ['clamp_control', 'alarm', 'rotate_reset', 'temperature_control'],
       admin: ['temperature_control', 'hopper', 'bottle_rotate', 'door_lock', 'clamp_control', 'alarm', 'injection_control', 'rotate_reset']
     };
-    
-    // If level is not recognized, default to guest with no access
-    if (!level || !accessMap[level]) {
-      console.log(`📦 Access denied for level: ${level}, key: ${key}`);
-      return false;
-    }
-    
-    const hasAccess = accessMap[level].includes(key);
-    console.log(`📦 Access check for level: ${level}, key: ${key}, result: ${hasAccess}`);
-    return hasAccess;
+    if (!level || !accessMap[level]) return false;
+    return accessMap[level].includes(key);
   };
 
-  // Handle errors gracefully
   const handleError = (context, error) => {
     console.error(`Error in Footer component (${context}):`, error);
-    // You could add additional error handling here, such as displaying a notification
   };
   
-  // Check server connection status
   const checkConnectionStatus = async () => {
     try {
       const healthEndpoint = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5001';
@@ -46,89 +38,46 @@ const Footer = ({ userLevel: propUserLevel }) => {
     }
   };
 
-  // Check connection status periodically
   useEffect(() => {
-    // Initial check
     checkConnectionStatus();
-    
-    // Set up interval for periodic checks (every 30 seconds)
     const intervalId = setInterval(checkConnectionStatus, 30000);
-    
-    // Clean up interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
 
-  // Update UI when user level changes
   const updateUIForUserLevel = (level) => {
     if (!level) return;
-    
-    const normalizedLevel = level.toLowerCase();
-    console.log(`📦 Updating UI for user level: ${normalizedLevel}`);
-    setUserLevel(normalizedLevel);
-    
-    // You could add additional UI updates based on user level here
+    setUserLevel(level.toLowerCase());
   };
   
-  // Handle user level
   useEffect(() => {
     if (propUserLevel) {
-      console.log("📦 Footer received userLevel from props:", propUserLevel); 
       updateUIForUserLevel(propUserLevel);
     } else {
       try {
-        // First try to get user from localStorage as a JSON string
         const userDataStr = localStorage.getItem("user");
-        console.log("📦 Footer read user string from localStorage:", userDataStr);
-        
         if (userDataStr) {
           const userData = JSON.parse(userDataStr);
-          console.log("📦 Footer parsed user from localStorage:", userData);
-          
-          if (userData?.userLevel) {
-            updateUIForUserLevel(userData.userLevel);
-          }
+          if (userData?.userLevel) updateUIForUserLevel(userData.userLevel);
         } else {
-          // Fallback: Try to get authToken and decode it
           const token = localStorage.getItem("authToken");
           if (token) {
             try {
-              // JWT tokens are in format: header.payload.signature
-              let decodedPayload = null;
-              
-              try {
-                // We need the payload part which is the second part
-                const payload = token.split('.')[1];
-                if (!payload) {
-                  throw new Error('Invalid token format');
-                }
-                
-                // The payload is base64url encoded, we need to handle it properly
-                // Replace non-base64 chars and add padding if needed
-                const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-                const paddedBase64 = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, '=');
-                
-                // Now decode it
-                const decodedText = atob(paddedBase64);
-                decodedPayload = JSON.parse(decodedText);
-                console.log("📦 Footer decoded token payload:", decodedPayload);
-              } catch (decodeError) {
-                 handleError('decoding JWT payload', decodeError);
-               }
-              
-              if (decodedPayload && decodedPayload.userLevel) {
-                 updateUIForUserLevel(decodedPayload.userLevel);
-                
-                // Store the user info in localStorage for future use
-                const userInfo = {
+              const payload = token.split('.')[1];
+              const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+              const paddedBase64 = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, '=');
+              const decodedText = atob(paddedBase64);
+              const decodedPayload = JSON.parse(decodedText);
+              if (decodedPayload?.userLevel) {
+                updateUIForUserLevel(decodedPayload.userLevel);
+                localStorage.setItem("user", JSON.stringify({
                   id: decodedPayload.userId,
                   name: decodedPayload.name,
                   userLevel: decodedPayload.userLevel
-                };
-                localStorage.setItem("user", JSON.stringify(userInfo));
+                }));
               }
-            } catch (tokenErr) {
-                handleError('decoding token', tokenErr);
-              }
+            } catch (err) {
+              handleError('decoding token', err);
+            }
           }
         }
       } catch (err) {
@@ -137,16 +86,10 @@ const Footer = ({ userLevel: propUserLevel }) => {
     }
   }, [propUserLevel]);
 
-  // Handle control button clicks
   const handleControlClick = (item) => {
-    const hasAccess = checkAccess(userLevel, item.key);
-    
-    if (hasAccess) {
-      console.log(`Control activated: ${item.key}`);
-      // Implement the actual control functionality here
+    if (checkAccess(userLevel, item.key)) {
       alert(`${item.label} control activated by ${userLevel} user`);
     } else {
-      console.log(`Access denied to ${item.key} for user level: ${userLevel}`);
       alert(`Access denied: Your user level (${userLevel}) does not have permission to use ${item.label}`);
     }
   };
@@ -164,9 +107,10 @@ const Footer = ({ userLevel: propUserLevel }) => {
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 bg-gradient-to-b from-slate-700 to-slate-900 border-t border-slate-600 shadow-lg">
-      <div className="flex flex-col px-4 py-2">
+      <div className="flex flex-col px-2 py-0.5">
+        
         {/* User level indicator */}
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-1">
           <div className="flex items-center">
             <span className="text-xs text-gray-400 mr-2">Access Level:</span>
             <span className={`text-xs font-semibold px-2 py-0.5 rounded ${userLevel === 'admin' ? 'bg-purple-900 text-purple-200' : 
@@ -180,54 +124,52 @@ const Footer = ({ userLevel: propUserLevel }) => {
         </div>
         
         <div className="flex items-center justify-between">
-        {/* Connection status indicator */}
-        <div className="flex items-center space-x-2">
-          {connectionStatus === 'connected' ? (
-            <Wifi size={18} className="text-green-400" />
-          ) : connectionStatus === 'disconnected' ? (
-            <WifiOff size={18} className="text-red-400 animate-pulse" />
-          ) : (
-            <Wifi size={18} className="text-yellow-400 animate-pulse" />
-          )}
-          <span className="text-xs text-gray-300">
-            {connectionStatus === 'connected' ? 'Connected' : 
-             connectionStatus === 'disconnected' ? 'Connection Error' : 'Checking...'}
-          </span>
-          {lastChecked && (
-            <span className="text-xs text-gray-500 ml-1">
-              {`Last checked: ${lastChecked.toLocaleTimeString()}`}
+          {/* Connection status indicator */}
+          <div className="flex items-center gap-x-1 leading-tight">
+            {connectionStatus === 'connected' ? (
+              <Wifi size={14} className="text-green-400" />
+            ) : connectionStatus === 'disconnected' ? (
+              <WifiOff size={14} className="text-red-400 animate-pulse" />
+            ) : (
+              <Wifi size={14} className="text-yellow-400 animate-pulse" />
+            )}
+            <span className="text-xs text-gray-300">
+              {connectionStatus === 'connected' ? 'Connected' : 
+              connectionStatus === 'disconnected' ? 'Connection Error' : 'Checking...'}
             </span>
-          )}
-        </div>
-        
-        {/* Control buttons */}
-        <div className="flex items-center space-x-3">
-          {footerItems.map((item, index) => {
-            const Icon = item.icon;
-            const canAccess = checkAccess(userLevel, item.key);
+            {lastChecked && (
+              <span className="text-xs text-gray-500 ml-1">
+                {`Last checked: ${lastChecked.toLocaleTimeString()}`}
+              </span>
+            )}
+          </div>
+          
+          {/* Control buttons */}
+          <div className="flex items-center space-x-2">
+            {footerItems.map((item) => {
+              const Icon = item.icon;
+              const canAccess = checkAccess(userLevel, item.key);
 
-            return (
-              <div
-                key={item.key}
-                className={`
-                  flex items-center justify-center w-20 h-16 rounded-lg transition-colors
-                  ${canAccess
-                    ? 'text-blue-400 hover:text-white hover:bg-slate-600 cursor-pointer'
-                    : 'text-gray-500 opacity-50 cursor-not-allowed'
-                  }
-                `}
-                title={canAccess ? item.label : `${item.label} (Restricted)`}
-                onClick={() => handleControlClick(item)}
-              >
-                <Icon size={36} strokeWidth={2.2} />
-              </div>
-            );
-          })}
-        </div>
+              return (
+                <div
+                  key={item.key}
+                  className={`flex items-center justify-center w-14 h-12 rounded-md transition-colors
+                    ${canAccess
+                      ? 'text-blue-400 hover:text-white hover:bg-slate-600 cursor-pointer'
+                      : 'text-gray-500 opacity-50 cursor-not-allowed'
+                    }`}
+                  title={canAccess ? item.label : `${item.label} (Restricted)`}
+                  onClick={() => handleControlClick(item)}
+                >
+                  <Icon size={28} strokeWidth={2} />
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
       
-      {/* Debug info - only visible in development */}
+      {/* Debug info */}
       {import.meta.env.DEV && (
         <div className="bg-gray-900 border-t border-gray-800 px-4 py-1">
           <details className="text-xs text-gray-500">

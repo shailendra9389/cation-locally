@@ -55,7 +55,7 @@ export default function ThreeDViewer({ scale = 1 }) {
         antialias: true
       }}
     >
-      <color attach="background" args={['#7a7a7a']} />
+      <color attach="background" args={['#ffffff']} />
       
       {/* Enhanced lighting setup */}
       <ambientLight intensity={0.35} />

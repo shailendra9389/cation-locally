@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:9000/api';
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -121,7 +121,7 @@ export const userAPI = {
   createUser: async (userData) => {
     try {
       const response = await apiClient.post('/users', userData);
-      return response.data; 
+      return { success: true, data: response.data };
     } catch (error) {
       return handleApiError(error);
     }

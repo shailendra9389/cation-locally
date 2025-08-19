@@ -13,8 +13,8 @@ const pool = new Pool({
 
 async function updatePassword() {
   try {
-    const username = 'Shailendra';
-    const password = 'sp1234';
+    const username = 'Admin User';
+    const password = 'admin123';
     
     // Generate new password hash
     const passwordHash = await bcrypt.hash(password, 10);

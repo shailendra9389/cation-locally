@@ -72,7 +72,6 @@
 
 
 // db.js
-// db.js
 import pkg from 'pg';
 const { Pool } = pkg;
 import dotenv from 'dotenv';
@@ -82,7 +81,7 @@ dotenv.config();
 let pool;
 
 /**
- * Create a new connection pool to Neon
+ * Create a new connection pool to Neon DB
  */
 function createPool() {
   pool = new Pool({
@@ -97,11 +96,9 @@ function createPool() {
   // Handle unexpected errors on idle clients
   pool.on('error', (err) => {
     console.error('❌ Unexpected error on idle client', err);
-
-    if (
-      err.message.includes('Connection terminated unexpectedly') ||
-      err.code === 'ECONNRESET'
-    ) {
+    
+    // Recreate pool on connection issues
+    if (err.code === 'ECONNRESET' || err.message.includes('Connection terminated unexpectedly')) {
       console.log('🔄 Recreating pool due to connection loss...');
       recreatePool();
     }

@@ -8,11 +8,11 @@ import { testConnection } from './db.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 9000;
 
 // Middleware
 app.use(cors({
-  origin: '*', // Allow all origins temporarily for debugging
+  origin: process.env.CORS_ORIGIN,
   credentials: true
 }));
 

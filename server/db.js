@@ -81,16 +81,19 @@ dotenv.config();
 let pool;
 
 /**
- * Create a new connection pool to Neon DB
+ * Create a new connection pool to local PostgreSQL
  */
 function createPool() {
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }, // Required for Neon SSL
-    idleTimeoutMillis: 0,               // Close idle connections immediately
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'cation',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD,
+    idleTimeoutMillis: 30000,           // 30s idle timeout
     connectionTimeoutMillis: 30000,     // 30s connection timeout
     keepAlive: true,                    // Keep TCP alive
-    max: 5                              // Neon free tier allows few connections
+    max: 20                             // Local PostgreSQL can handle more connections
   });
 
   // Handle unexpected errors on idle clients
@@ -129,17 +132,17 @@ function recreatePool() {
 // Initialize pool at startup
 pool = createPool();
 
-// Keep-alive ping every 2.5 minutes (Neon idle cutoff ~5 min)
-const keepAliveInterval = 150000;
+// Health check every 10 minutes (less frequent for local PostgreSQL)
+const healthCheckInterval = 600000; // 10 minutes
 setInterval(async () => {
   try {
     await pool.query('SELECT 1');
-    console.log('✅ DB keep-alive ping sent');
+    console.log('✅ DB health check successful');
   } catch (err) {
-    console.error('❌ Keep-alive failed:', err.message);
+    console.error('❌ DB health check failed:', err.message);
     recreatePool();
   }
-}, keepAliveInterval);
+}, healthCheckInterval);
 
 /**
  * Test DB connection

@@ -75,11 +75,10 @@ export default function ThreeDViewer({ scale = 1 }) {
 
       <Suspense fallback={<Html center>Loading 3D Model...</Html>}>
         {/* Studio environment for better reflections */}
-        <Environment 
-          preset="studio"
-          background={false}
-          resolution={512}
-        />
+       <Environment 
+  files="/studio_small_03_1k.hdr" 
+  background={false} 
+/>
 
         <Model scale={scale} />
 

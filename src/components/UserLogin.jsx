@@ -53,7 +53,7 @@ const UserLogin = ({ onLoginSuccess }) => {
     <div className="bg-gray-800 border-2 border-gray-600 rounded-lg shadow-xl w-full max-w-md mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-gray-600">
-        <h2 className="text-xl font-bold text-white">User Authentication</h2>
+        <h2 className="text-xl font-bold text-white">User Authentication Intellimeta</h2>
       </div>
 
       {/* Login Form */}
